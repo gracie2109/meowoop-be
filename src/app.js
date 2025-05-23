@@ -10,8 +10,6 @@ import passport from "passport";
 
 import { engine } from "express-handlebars";
 
-// import './api/auth/googlePassport'
-// import './api/auth/localPassport'
 
 // routers
 import path from "path";
