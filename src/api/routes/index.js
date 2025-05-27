@@ -1,7 +1,8 @@
 import express, { Router } from "express";
 import PetsRouter from "../pets-setting/pet.route";
+import DashboardRouter from "../dashboard/dashboard.route";
 
-const rootRouters = [PetsRouter];
+const rootRouters = [PetsRouter, DashboardRouter];
 
 const router = express.Router();
 
