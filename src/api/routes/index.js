@@ -1,5 +1,5 @@
 import express, { Router } from "express";
-import PetsRouter from "../pets-setting/pet-type/pet.route";
+import PetsRouter from "../pets-setting/pet.route";
 
 const rootRouters = [PetsRouter];
 

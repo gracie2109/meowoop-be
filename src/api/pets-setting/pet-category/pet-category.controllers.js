@@ -1,8 +1,8 @@
-import { getAllPets, createPetType, deleteManyPets , updatePetType} from "./pet-type.service";
+import { getAll, createData, deleteData,updateData} from "./pet-category.services";
 
 export const searchList = async (req, res) => {
   try {
-    const data = await getAllPets(req.body);
+    const data = await getAll(req.body);
     res.status(200).json({ success: true, data });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -14,7 +14,7 @@ export const searchList = async (req, res) => {
 export const createNew = async (req, res) => {
   try {
     console.log('res', req.body)
-    const data = await createPetType(req.body);
+    const data = await createData(req.body);
     res.status(200).json({ success: true, data });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -30,7 +30,7 @@ export const deleteController = async (req, res) => {
       return res.status(400).json({ message: 'Danh sách ID không hợp lệ' })
     }
 
-    const result = await deleteManyPets(ids)
+    const result = await deleteData(ids)
 
     return res.status(200).json({
       message: 'Xóa thành công',
@@ -46,7 +46,7 @@ export const deleteController = async (req, res) => {
 export const update = async (req, res) => {
   try {
     console.log('res', req.body)
-    const data = await updatePetType(req.body);
+    const data = await updateData(req.body);
     res.status(200).json({ success: true, data });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
