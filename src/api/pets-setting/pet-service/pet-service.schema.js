@@ -34,16 +34,16 @@ const petServiceSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
-    target_ids: [
+    pet_type_ids: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Pets",
         autopopulate: true,
       },
     ],
-    duration: {
-      type: Number,
-      require: true,
+    additional_data: {
+      type: mongoose.Schema.Types.Mixed,
+      default: {},
     },
   },
   {

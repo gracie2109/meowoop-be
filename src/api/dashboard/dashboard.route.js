@@ -1,12 +1,12 @@
 import express from "express";
 import * as DashboardControl from "./dashboard.controller";
+import { ROUTER_PREFIX } from "../../constants/routePrefix";
 
-const PREFIX = "dashboard";
 
 const router = express.Router();
-router.post(`/${PREFIX}/get-all`, DashboardControl.searchList);
-router.post(`/${PREFIX}/create`, DashboardControl.createNew);
-router.delete(`/${PREFIX}/delete`, DashboardControl.deleteController);
-router.patch(`/${PREFIX}/update`, DashboardControl.update);
+router.post(`/${ROUTER_PREFIX.DASHBOARD}/get-all`, DashboardControl.searchList);
+router.post(`/${ROUTER_PREFIX.DASHBOARD}/create`, DashboardControl.createNew);
+router.delete(`/${ROUTER_PREFIX.DASHBOARD}/delete`, DashboardControl.deleteController);
+router.patch(`/${ROUTER_PREFIX.DASHBOARD}/update`, DashboardControl.update);
 
 export default router;
