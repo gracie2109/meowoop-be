@@ -76,7 +76,7 @@ app.use(
 /* Enabling CORS */
 app.use(
   cors({
-    origin: ['http://localhost:3004'],
+    origin: ['http://localhost:3004','http://localhost:4173','https://meowoop.vercel.app/'],
     // credentials: true,
     methods: ["GET", "POST", "PATCH", "PUT", "DELETE"],
     // preflightContinue: true,
