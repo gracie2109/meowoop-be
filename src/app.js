@@ -73,7 +73,7 @@ passport.use(
 /* Enabling CORS */
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
+    origin: [process.env.MAIN_FRONTEND_URL, process.env.LOCAL_FRONTEND_URL],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
