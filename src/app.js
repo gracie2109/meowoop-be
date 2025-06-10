@@ -10,26 +10,19 @@ import passport from "passport";
 
 import { engine } from "express-handlebars";
 
-
-// routers
 import path from "path";
 import rootRouter from "./api/routes";
 import AppConfig from "./configs/app.config";
-import { HttpStatusCode } from "./configs/statusCode.config";
-// import {createAdminServer} from "./api/services/createAdmin.server";
 import * as bodyParser from "body-parser";
-// import UserModel from "./api/models/user.model";
-
-import cloudinary from "./configs/cloudinary";
-// resolve path
+import { Strategy } from "passport-google-oauth20";
+import userRoutes from './api/modules/user/user.route';
 const ROOT_FOLDER = path.join(__dirname, "..");
 const SRC_FOLDER = path.join(ROOT_FOLDER, "src");
 
-/* Initialize Express app */
 const app = express();
 
-/* Request body parser */
 app.use(express.json());
+
 /* Security request headers */
 app.use(
   helmet({
@@ -45,16 +38,11 @@ app.use(
         "script-src": ["'self'", "'unsafe-inline'", AppConfig.TAILWIND_CDN],
       },
     },
-    // referrerPolicy: {
-    // 	policy: 'strict-origin-when-cross-origin'
-    // }
   })
 );
 
-/* Logger */
 app.use(morgan("tiny"));
 
-/* Using Session - Cookies */
 app.use(cookieParser());
 
 app.use(bodyParser.json());
@@ -66,20 +54,29 @@ app.use(
     secret: AppConfig.KEY_SESSION,
     store: new MemoryStore(),
     resave: true,
-    // cookie: {
-    // 	sameSite: 'none',
-    // 	path: '/'
-    // }
   })
+);
+
+passport.use(
+  new Strategy(
+    {
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: process.env.CALL_BACK_URL,
+    },
+    (accessToken, refreshToken, profile, done) => {
+      return done(null, profile);
+    }
+  )
 );
 
 /* Enabling CORS */
 app.use(
   cors({
-    origin: ['http://localhost:3004','http://localhost:4173','https://meowoop.vercel.app'],
-    // credentials: true,
-    methods: ["GET", "POST", "PATCH", "PUT", "DELETE"],
-    // preflightContinue: true,
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
   })
 );
 
@@ -94,33 +91,15 @@ app.set("view engine", "handlebars");
 app.set("views", path.resolve(SRC_FOLDER, "./views"));
 
 app.use("/api", rootRouter);
+app.use('/api/auth', userRoutes);
 
-// app.get('/', async (req, res) => {
-// 	try {
-// 		const countUser = await UserModel.countDocuments();
-// 		if(countUser === 0){   
-// 			await res.render("home");
-// 		}else{
-// 			await res.render("redirectToClient");
-// 		}
-
-// 	}catch (e) {
-// 		console.log("create website fail", e)
-// 	}
-// })
-
-// app.post('/thank-you', async (req, res) => {
-// 	const body = req.body;
-// 	try {
-// 		await createAdminServer(body);
-// 		return res.render("thankyou");
-
-// 	}catch (err){
-// 		console.log('err', err);
-// 		return  res.status(HttpStatusCode.BAD_REQUEST).json({
-// 			message: "Create user fail!"
-// 		})
-// 	}
-// })
+// Error handling
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(err.status || 500).json({
+    success: false,
+    message: err.message || 'Internal Server Error'
+  });
+});
 
 export default app;

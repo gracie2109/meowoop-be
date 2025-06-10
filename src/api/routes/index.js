@@ -1,6 +1,6 @@
 import express, { Router } from "express";
-import PetsRouter from "../pets-setting/pet.route";
-import DashboardRouter from "../dashboard/dashboard.route";
+import PetsRouter from "../modules/pets-setting/pet.route";
+import DashboardRouter from "../modules/dashboard/dashboard.route";
 
 const rootRouters = [PetsRouter, DashboardRouter];
 

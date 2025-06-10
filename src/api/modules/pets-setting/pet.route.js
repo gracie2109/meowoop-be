@@ -1,5 +1,5 @@
 import express from "express";
-import { ROUTER_PREFIX } from "../../constants/routePrefix"
+import { ROUTER_PREFIX } from "../../../constants/routePrefix"
 import * as PetType from "./pet-type/pet-type.controller";
 import * as PetCategory from "./pet-category/pet-category.controllers";
 import * as PetService from "./pet-service/pet-service.controllers"

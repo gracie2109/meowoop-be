@@ -1,6 +1,6 @@
 import express from "express";
 import * as DashboardControl from "./dashboard.controller";
-import { ROUTER_PREFIX } from "../../constants/routePrefix";
+import { ROUTER_PREFIX } from "../../../constants/routePrefix";
 
 
 const router = express.Router();
