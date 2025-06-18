@@ -4,5 +4,6 @@ export const ROUTER_PREFIX = {
     PET_SERVICE: 'pet-service',
     DASHBOARD: 'dashboard',
     PET_WEIGHT: 'pet-weight',
-    SERVICE_PRICE: 'service-price'
+    SERVICE_PRICE: 'service-price',
+    ASSET: 'assets'
 }
