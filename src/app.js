@@ -7,7 +7,7 @@ import session, { MemoryStore } from "express-session";
 import helmet from "helmet";
 import morgan from "morgan";
 import passport from "passport";
-import APP  from "./api/modules/address/services"
+import APP from "./api/modules/address/services";
 import { engine } from "express-handlebars";
 
 import path from "path";
@@ -15,7 +15,7 @@ import rootRouter from "./api/routes";
 import AppConfig from "./configs/app.config";
 import * as bodyParser from "body-parser";
 import { Strategy } from "passport-google-oauth20";
-import userRoutes from './api/modules/user/user.route';
+import userRoutes from "./api/modules/user/user.route";
 const ROOT_FOLDER = path.join(__dirname, "..");
 const SRC_FOLDER = path.join(ROOT_FOLDER, "src");
 
@@ -73,10 +73,14 @@ passport.use(
 /* Enabling CORS */
 app.use(
   cors({
-    origin: [process.env.MAIN_FRONTEND_URL, process.env.LOCAL_FRONTEND_URL, 'http://localhost:3004'],
+    origin: [
+      process.env.MAIN_FRONTEND_URL,
+      process.env.LOCAL_FRONTEND_URL,
+      "http://localhost:3004",
+    ],
     // credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
@@ -91,14 +95,22 @@ app.set("view engine", "handlebars");
 app.set("views", path.resolve(SRC_FOLDER, "./views"));
 
 app.use("/api", rootRouter);
-app.use('/api/auth', userRoutes);
+app.use("/api/auth", userRoutes);
+
+
+app.get("/", (req, res) => {
+  const url = AppConfig.isProductionMode
+    ? process.env.MAIN_FRONTEND_URL
+    : process.env.LOCAL_FRONTEND_URL;
+  res.render("home", { linkUrl: url });
+});
 
 // Error handling
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(err.status || 500).json({
     success: false,
-    message: err.message || 'Internal Server Error'
+    message: err.message || "Internal Server Error",
   });
 });
 
