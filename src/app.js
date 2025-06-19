@@ -7,7 +7,7 @@ import session, { MemoryStore } from "express-session";
 import helmet from "helmet";
 import morgan from "morgan";
 import passport from "passport";
-
+import APP  from "./api/modules/address/services"
 import { engine } from "express-handlebars";
 
 import path from "path";
@@ -73,9 +73,9 @@ passport.use(
 /* Enabling CORS */
 app.use(
   cors({
-    origin: [process.env.MAIN_FRONTEND_URL, process.env.LOCAL_FRONTEND_URL],
+    origin: [process.env.MAIN_FRONTEND_URL, process.env.LOCAL_FRONTEND_URL, 'http://localhost:3004'],
     // credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization']
   })
 );

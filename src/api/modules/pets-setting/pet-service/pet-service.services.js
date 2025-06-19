@@ -85,19 +85,24 @@ export const updatePetService = async (payload) => {
     throw new Error("ID không hợp lệ");
   }
 
+  try {
+    const updatedPet = await PetServiceModel.findByIdAndUpdate(
+      payload.id,
+      { $set: payload },
+      { new: true }
+    );
 
+    if (!updatedPet) {
+      throw new Error("Không tìm thấy pet type với ID này");
+    }
 
-  const updatedPet = await PetServiceModel.findByIdAndUpdate(
-    payload.id,
-    { $set: payload },
-    { new: true, runValidators: true }
-  );
-
-  if (!updatedPet) {
-    throw new Error("Không tìm thấy pet type với ID này");
+    return updatedPet;
+  } catch (error) {
+    console.log("error", error);
+    throw new Error(
+      "Không thể xóa dịch vụ này vì nó đang được tham chiếu trong các bản ghi giá."
+    );
   }
-
-  return updatedPet;
 };
 
 export const getAll = async (payload) => {

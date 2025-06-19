@@ -10,7 +10,7 @@ cloudinary.config({
 });
 
 cloudinary.api.ping()
-  .then(() => console.log('Cloudinary connected successfully'))
-  .catch(err => console.error('Cloudinary connection failed:', err));
+  .then(() => console.log('[SUCCESS] ::: Connected to cloundinary'))
+  .catch(err => console.log('[ERROR] ::: Connected fail to cloundinary', err.message));
 
 export default cloudinary

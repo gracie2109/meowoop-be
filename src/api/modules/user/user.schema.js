@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: function() {
+      required: function () {
         return !this.googleId;
       },
     },
@@ -30,23 +30,25 @@ const userSchema = new mongoose.Schema(
       type: String,
     },
     dob: {
-          type: mongoose.Schema.Types.Mixed,
+      type: mongoose.Schema.Types.Mixed,
     },
-    refreshTokens: [{
-      token: String,
-      expiresAt: Date,
-      createdAt: {
-        type: Date,
-        default: Date.now,
+    refreshTokens: [
+      {
+        token: String,
+        expiresAt: Date,
+        createdAt: {
+          type: Date,
+          default: Date.now,
+        },
+        deviceInfo: {
+          type: String,
+        },
+        isRevoked: {
+          type: Boolean,
+          default: false,
+        },
       },
-      deviceInfo: {
-        type: String,
-      },
-      isRevoked: {
-        type: Boolean,
-        default: false,
-      }
-    }],
+    ],
     isActive: {
       type: Boolean,
       default: true,
@@ -54,6 +56,20 @@ const userSchema = new mongoose.Schema(
     lastLoginAt: {
       type: Date,
     },
+
+    defaultAddressId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Address",
+      autopopulate: true,
+    },
+    addresses: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Address",
+        autopopulate: true,
+      },
+    ],
+    
   },
   {
     timestamps: true,

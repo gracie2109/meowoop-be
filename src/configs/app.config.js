@@ -1,4 +1,4 @@
-import 'dotenv/config'
+import 'dotenv/config';
 
 const isProduction = process.env.NODE_ENV?.includes('production')
 const AppConfig = {
@@ -7,7 +7,8 @@ const AppConfig = {
     CLIENT_URL: isProduction ? process.env.MAIN_FRONTEND_URL : process.env.LOCAL_FRONTEND_URL,
     MONGO_URI: isProduction ? process.env.PRODUCTION_DB_URI : process.env.TEST_DB_URI,
     TAILWIND_CDN: 'https://cdn.tailwindcss.com',
-    BOOTSTRAP_ICONS_CDN: 'https://cdn.tailwindcss.com'
+    BOOTSTRAP_ICONS_CDN: 'https://cdn.tailwindcss.com',
+    isProductionMode: isProduction
 }
 
 export default AppConfig
