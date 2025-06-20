@@ -49,11 +49,11 @@ export const registerUser = async (payload) => {
     email,
     password: hashedPassword,
     name,
-    refreshTokens: [
+    refesh_token: [
       {
         token: refreshToken,
-        expiresAt: refreshTokenExpiresAt,
-        deviceInfo: payload.deviceInfo || "Unknown Device",
+        expires_at: refreshTokenExpiresAt,
+        device_info: payload.deviceInfo || "Unknown Device",
       },
     ],
   });
@@ -68,7 +68,7 @@ export const registerUser = async (payload) => {
 };
 
 export const loginUser = async (payload) => {
-  const { email, password, deviceInfo } = payload;
+  const { email, password, device_info } = payload;
 
   if (!email || !password) {
     throw createHttpError.BadRequest("Email và password là bắt buộc");
@@ -89,11 +89,11 @@ export const loginUser = async (payload) => {
 
   user.refreshTokens.push({
     token: refreshToken,
-    expiresAt: refreshTokenExpiresAt,
-    deviceInfo: deviceInfo || "Unknown Device",
+    expires_at: refreshTokenExpiresAt,
+    device_info: device_info || "Unknown Device",
   });
 
-  user.lastLoginAt = new Date();
+  user.last_login_at = new Date();
   await user.save();
 
   const accessToken = generateAccessToken(user);
@@ -121,18 +121,18 @@ export const handleGoogleAuth = async (profile) => {
     user = await User.create({
       email: emails[0].value,
       name: displayName,
-      googleId: id,
+      google_id: id,
       avatar: photos?.[0]?.value,
-      refreshTokens: [
+      refesh_token: [
         {
           token: refreshToken,
-          expiresAt: refreshTokenExpiresAt,
-          deviceInfo: "Google OAuth",
+          expires_at: refreshTokenExpiresAt,
+          device_info: "Google OAuth",
         },
       ],
     });
   } else if (!user.googleId) {
-    user.googleId = id;
+    user.google_id = id;
     user.avatar = photos?.[0]?.value;
   }
 
@@ -141,11 +141,11 @@ export const handleGoogleAuth = async (profile) => {
 
   user.refreshTokens.push({
     token: refreshToken,
-    expiresAt: refreshTokenExpiresAt,
-    deviceInfo: "Google OAuth",
+    expires_at: refreshTokenExpiresAt,
+    device_info: "Google OAuth",
   });
 
-  user.lastLoginAt = new Date();
+  user.last_login_at = new Date();
   await user.save();
 
   const accessToken = generateAccessToken(user);
@@ -160,8 +160,8 @@ export const handleGoogleAuth = async (profile) => {
 export const refreshAccessToken = async (refreshToken) => {
   const user = await User.findOne({
     "refreshTokens.token": refreshToken,
-    "refreshTokens.isRevoked": false,
-    "refreshTokens.expiresAt": { $gt: new Date() },
+    "refreshTokens.is_revoked": false,
+    "refreshTokens.expires_at": { $gt: new Date() },
   });
 
   if (!user) {
@@ -182,11 +182,11 @@ export const logout = async (userId, refreshToken) => {
 
   // Revoke specific refresh token
   const tokenIndex = user.refreshTokens.findIndex(
-    (token) => token.token === refreshToken && !token.isRevoked
+    (token) => token.token === refreshToken && !token.is_revoked
   );
 
   if (tokenIndex !== -1) {
-    user.refreshTokens[tokenIndex].isRevoked = true;
+    user.refreshTokens[tokenIndex].is_revoked = true;
     await user.save();
   }
 
@@ -199,8 +199,8 @@ export const logoutAllDevices = async (userId) => {
     throw createHttpError.NotFound("User không tồn tại");
   }
 
-  user.refreshTokens.forEach((token) => {
-    token.isRevoked = true;
+  user.refesh_token.forEach((token) => {
+    token.is_revoked = true;
   });
 
   await user.save();

@@ -18,7 +18,7 @@ const healthRecordSchema = new mongoose.Schema({
   description: { type: String },
   veterinarian: {
     //Bác sĩ thú y
-    id: { type: mongoose.Types.ObjectId, ref: "User" },
+    id: { type: mongoose.Types.ObjectId, ref: "Employee" },
     name: { type: String },
     specialty: { type: String },
   },
