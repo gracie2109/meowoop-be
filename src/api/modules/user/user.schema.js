@@ -69,7 +69,6 @@ const userSchema = new mongoose.Schema(
         autopopulate: true,
       },
     ],
-    
   },
   {
     timestamps: true,

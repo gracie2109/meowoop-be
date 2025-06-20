@@ -40,46 +40,6 @@ const createPetService = async (data) => {
   }
 };
 
-// export const updatePetService = async (id, data) => {
-//   try {
-//     // if (
-//     //   pet_type_ids &&
-//     //   Array.isArray(pet_type_ids) &&
-//     //   pet_type_ids.length > 0
-//     // ) {
-//     //   const validTargets = await PetTypeModel.find({
-//     //     _id: { $in: pet_type_ids.map((id) => new mongoose.Types.ObjectId(id)) },
-//     //   });
-
-//     //   if (validTargets.length !== pet_type_ids.length) {
-//     //     throw new Error("One or more pet_type_ids are invalid or do not exist");
-//     //   }
-//     // }
-
-//     // const updateData = {
-//     //  ...data,
-//     //   pet_type_ids: pet_type_ids || [],
-//     // };
-
-//     const updatedPetService = await PetServiceModel.findByIdAndUpdate(
-//       data?.id,
-//       { $set: data },
-//       { new: true, runValidators: true }
-//     );
-
-//     if (!updatedPetService) {
-//       throw new Error("PetService not found");
-//     }
-
-//     const populatedPetService = await PetServiceModel.findById(
-//       updatedPetService._id
-//     ).populate("pet_type_ids");
-
-//     return populatedPetService;
-//   } catch (error) {
-//     throw new Error(`Failed to update PetService: ${error.message}`);
-//   }
-// };
 export const updatePetService = async (payload) => {
   if (!mongoose.Types.ObjectId.isValid(payload.id)) {
     throw new Error("ID không hợp lệ");
