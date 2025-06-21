@@ -1,28 +1,20 @@
 import mongoose from "mongoose";
+import { EXAMINATION_TYPE_KEY, PET_HEALTH_OVERALL_KEY } from "./contants";
 
 const healthRecordSchema = new mongoose.Schema({
   record_type: {
     type: String,
     required: true,
-    enum: [
-      "vaccination",
-      "examination",
-      "treatment",
-      "measurement",
-      "medication",
-      "other",
-    ],
+    enum: EXAMINATION_TYPE_KEY,
   },
   date: { type: Date, required: true },
   title: { type: String, required: true },
   description: { type: String },
   veterinarian: {
-    //Bác sĩ thú y
     id: { type: mongoose.Types.ObjectId, ref: "Employee" },
     name: { type: String },
     specialty: { type: String },
   },
-  clinic: { type: String }, // phòng khám
   cost: { type: Number },
   details: [
     {
@@ -61,8 +53,7 @@ const petHealthSchema = new mongoose.Schema(
     },
     records: [healthRecordSchema],
 
-    profiles_data: [
-      // lưu các thông tin tùy chọn
+    profiles_data: [ // thông tin ngoài lề ( thói quen ăn uống/ dị ứng...)
       {
         field_name: { type: String, required: true },
         field_type: {
@@ -101,8 +92,8 @@ const petHealthSchema = new mongoose.Schema(
     status: {
       overall: {
         type: String,
-        enum: ["healthy", "needs_attention", "critical"],
-        default: "healthy",
+        enum: PET_HEALTH_OVERALL_KEY,
+        default: PET_HEALTH_OVERALL_KEY.HEALTHY,
       },
       last_checkup: { type: Date },
       updated_by: { type: mongoose.Types.ObjectId, ref: "User" },

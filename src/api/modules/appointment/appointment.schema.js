@@ -4,19 +4,20 @@ const appointmentSchema = new mongoose.Schema({
   pet_id: {
     type: mongoose.Types.ObjectId,
     ref: "Boss",
-    required: true,
   },
   owner_id: {
     type: mongoose.Types.ObjectId,
     ref: "User",
     required: true,
   },
+  service_id: {
+    type: mongoose.Types.ObjectId,
+    ref: "PetService",
+  },
   veterinarian_id: {
     type: mongoose.Types.ObjectId,
-    ref: "User",
-    required: true,
+    ref: "Employee",
   },
-  clinic: { type: String },
   reason: { type: String }, // ví dụ: Khám định kỳ, tiêm phòng, triệu chứng lạ...
   note: { type: String },
   appointment_time: { type: Date, required: true },
