@@ -8,7 +8,6 @@ import BossRouter from "../modules/boss/boss.routes";
 import EmployeeRouter from "../modules/employee/employee.route";
 import PetHealthRouter from "../modules/pet-health/pet-health.route";
 import WorkingSceheduleRouter from "../modules/working-schedule/working-schedule.route";
-import AppointmentRouter from "../modules/appointment/appointment.route";
 
 const rootRouters = [
   PetsRouter,
@@ -19,8 +18,7 @@ const rootRouters = [
   BossRouter,
   EmployeeRouter,
   PetHealthRouter,
-  WorkingSceheduleRouter,
-  AppointmentRouter,
+  WorkingSceheduleRouter
 ];
 
 const router = express.Router();
