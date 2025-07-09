@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: function () {
-        return !this.googleId;
+        return !this.google_id;
       },
     },
     name: {
@@ -21,7 +21,7 @@ const userSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    googleId: {
+    google_id: {
       type: String,
       sparse: true,
       unique: true,
@@ -30,34 +30,55 @@ const userSchema = new mongoose.Schema(
       type: String,
     },
     dob: {
-      type: mongoose.Schema.Types.Mixed,
+      type: Date,
     },
-    refreshTokens: [
+    gender: {
+      type: String,
+      enum: ["male", "female", "other"],
+    },
+    phone_number: {
+      type: String,
+    },
+    locale: {
+      type: String,
+      default: "vi",
+    },
+    role: {
+      type: String,
+      enum: ["owner", "veterinarian", "staff", "admin"],
+      default: "owner",
+      index: true,
+    },
+    password_changed_at: {
+      type: Date,
+    },
+    refresh_tokens: [
       {
         token: String,
-        expiresAt: Date,
-        createdAt: {
+        expires_at: Date,
+        created_at: {
           type: Date,
           default: Date.now,
         },
-        deviceInfo: {
-          type: String,
+        device_info: {
+          platform: String,
+          browser: String,
+          ip: String,
         },
-        isRevoked: {
+        is_revoked: {
           type: Boolean,
           default: false,
         },
       },
     ],
-    isActive: {
+    is_active: {
       type: Boolean,
       default: true,
     },
-    lastLoginAt: {
+    last_login_at: {
       type: Date,
     },
-
-    defaultAddressId: {
+    default_address_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Address",
       autopopulate: true,
@@ -69,7 +90,6 @@ const userSchema = new mongoose.Schema(
         autopopulate: true,
       },
     ],
-    
   },
   {
     timestamps: true,
@@ -78,8 +98,9 @@ const userSchema = new mongoose.Schema(
 
 // Indexes
 userSchema.index({ email: 1 });
-userSchema.index({ googleId: 1 });
-userSchema.index({ "refreshTokens.token": 1 });
+userSchema.index({ google_id: 1 });
+userSchema.index({ "refresh_tokens.token": 1 });
+userSchema.index({ name: "text", email: "text" });
 
 // Plugins
 userSchema.plugin(mongoosePaginate);
