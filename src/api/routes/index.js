@@ -8,20 +8,24 @@ import BossRouter from "../modules/boss/boss.routes";
 import EmployeeRouter from "../modules/employee/employee.route";
 import PetHealthRouter from "../modules/pet-health/pet-health.route";
 import WorkingSceheduleRouter from "../modules/working-schedule/working-schedule.route";
+import PermissionRouter from "../modules/resource-permission/permission.route";
+
 
 const rootRouters = [
   PetsRouter,
   DashboardRouter,
   AssetRouter,
   AddressRoute,
-  UserRouter,
+  // UserRouter,
   BossRouter,
   EmployeeRouter,
   PetHealthRouter,
-  WorkingSceheduleRouter
+  WorkingSceheduleRouter,
+  PermissionRouter
 ];
 
 const router = express.Router();
+
 
 rootRouters.forEach((route) => {
   router.use(route);

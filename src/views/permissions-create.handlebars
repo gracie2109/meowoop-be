@@ -1,0 +1,82 @@
+<div class="h-[100vh] w-full border-red-600 grid place-items-center">
+  
+  <div class="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg border container">
+    
+   <div class="flex gap-3 items-center w-full ">
+  
+    <a href="permissions" class="flex gap-2 items-center mb-3">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgb(252, 186, 3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-left-icon lucide-arrow-left"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+      Trở về
+    </a>  
+  
+  </div> 
+   <h1 class="text-2xl font-bold text-gray-800 mb-2">Tạo Resource</h1>
+
+  <p class="text-sm text-gray-500 mb-6">Tạo và quản lý quyền truy cập cho hệ  thống</p>
+
+  <form method="POST" action="/api/resource/create" class="space-y-6">
+    <div>
+      <label for="name" class="block text-gray-700 font-medium mb-2">Tên
+        Resource</label>
+      <input
+        type="text"
+        name="name"
+        id="name"
+        placeholder="Ví dụ: Quản lý người dùng"
+        required
+        class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+
+    <div>
+      <h3 class="text-lg font-semibold text-gray-800 mb-2">Chọn Actions</h3>
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+        {{#each actions}}
+          <label
+            class="flex items-start space-x-2 bg-gray-50 p-3 rounded-md border border-gray-200 hover:bg-gray-100"
+          >
+            <input
+              type="checkbox"
+              name="actions[]"
+              value="{{this.code}}"
+              class="mt-1"
+            />
+            <div>
+              <span class="font-medium">{{this.label}}</span><br />
+              <span class="text-sm text-gray-500">{{this.description}}</span>
+            </div>
+          </label>
+        {{/each}}
+      </div>
+      <button
+        type="button"
+        onclick="selectAll()"
+        class="mt-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-sm rounded-md"
+      >
+        Chọn tất cả
+      </button>
+    </div>
+
+    <button
+      type="submit"
+      class="w-full py-3 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700"
+    >
+      Tạo Permission
+    </button>
+  </form>
+
+
+  {{#if notification}}
+  <div class="p-4 mb-4 rounded-lg {{#if (eq notification.type 'success')}}bg-green-100 text-green-800{{else}}bg-red-100 text-red-800{{/if}}">
+    {{notification.message}}
+  </div>
+{{/if}}
+</div>
+</div>
+
+<script>
+  function selectAll() {
+  document.querySelectorAll("input[type='checkbox']").forEach(cb => cb.checked =
+  true); }
+
+</script>

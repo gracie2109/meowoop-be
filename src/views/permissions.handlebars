@@ -1,0 +1,61 @@
+<div class="p-5">
+  <div class="flex gap-3 items-center">
+    <h1 class="my-3 font-bold">Danh sách resource</h1>
+    <a href="permissions-create">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="rgb(252, 186, 3)"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="lucide lucide-circle-plus-icon lucide-circle-plus"
+      ><circle cx="12" cy="12" r="10" /><path d="M8 12h8" /><path
+          d="M12 8v8"
+        /></svg>
+    </a>
+  </div>
+  <div class="w-full grid grid-cols-4 gap-6">
+    {{#each resources as |resource idx|}}
+      <!-- Accordion Item -->
+      <div class="border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+        <!-- Input ẩn làm trigger -->
+        <input type="checkbox" id="res-{{idx}}" class="hidden peer" />
+
+        <!-- Header -->
+        <label
+          for="res-{{idx}}"
+          class="flex justify-between items-center px-4 py-3 cursor-pointer bg-white hover:bg-gray-100 transition-colors duration-200"
+        >
+          <span class="font-semibold text-gray-800">{{resource.name}}</span>
+        </label>
+
+        {{#if resource.permissions.length}}
+          <!-- Content -->
+          <div
+            class="max-h-0 overflow-hidden transition-all duration-300 peer-checked:max-h-96 bg-gray-50"
+          >
+            <div class="p-4 flex flex-wrap gap-4">
+              {{#each resource.permissions as |perm|}}
+                <label
+                  class="flex items-center justify-between flex-1 basis-[calc(25%-1rem)] px-3 py-2 bg-white hover:bg-gray-100 rounded border cursor-pointer transition-colors duration-150"
+                >
+                  <span class="text-gray-700">{{perm.action_name}}</span>
+                  <input
+                    type="checkbox"
+                    class="accent-blue-500 w-4 h-4"
+                    checked
+                    disabled
+                  />
+                </label>
+              {{/each}}
+            </div>
+          </div>
+        {{/if}}
+      </div>
+    {{/each}}
+  </div>
+</div>

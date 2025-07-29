@@ -14,4 +14,6 @@ export const ROUTER_PREFIX = {
   PET_HEALTH: "pet-health",
   WORKING_SCHEDULE: "working-schedule",
   APPOINTMENT: "appointment",
+  RESOURCE: 'resource',
+  PERMISSION: 'permission'
 };

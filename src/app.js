@@ -7,7 +7,6 @@ import session, { MemoryStore } from "express-session";
 import helmet from "helmet";
 import morgan from "morgan";
 import passport from "passport";
-import APP from "./api/modules/address/services";
 import { engine } from "express-handlebars";
 
 import path from "path";
@@ -15,7 +14,9 @@ import rootRouter from "./api/routes";
 import AppConfig from "./configs/app.config";
 import * as bodyParser from "body-parser";
 import { Strategy } from "passport-google-oauth20";
-import userRoutes from "./api/modules/user/user.route";
+import { actionList } from "./constants/permission";
+import { getAllResourceDetails } from "./api/modules/resource-permission/permission.services";
+
 const ROOT_FOLDER = path.join(__dirname, "..");
 const SRC_FOLDER = path.join(ROOT_FOLDER, "src");
 
@@ -46,7 +47,7 @@ app.use(morgan("tiny"));
 app.use(cookieParser());
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(
   session({
@@ -89,20 +90,39 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 /* Engine */
+app.engine(
+  "handlebars",
+  engine({
+    extname: ".handlebars",
+    helpers: {
+      eq: (a, b) => a === b,
+    },
+  })
+);
 
-app.engine("handlebars", engine());
 app.set("view engine", "handlebars");
 app.set("views", path.resolve(SRC_FOLDER, "./views"));
 
 app.use("/api", rootRouter);
-app.use("/api/auth", userRoutes);
+// app.use("/api/auth", userRoutes);
 
-
+/* UI PATH */
 app.get("/", (req, res) => {
   const url = AppConfig.isProductionMode
     ? process.env.MAIN_FRONTEND_URL
     : process.env.LOCAL_FRONTEND_URL;
   res.render("home", { linkUrl: url });
+});
+
+app.get("/permissions-create", async (req, res) => {
+  res.render("permissions-create", {
+    actions: actionList,
+  });
+});
+
+app.get("/permissions", async (req, res) => {
+  const data = await getAllResourceDetails();
+  res.render("permissions", { resources: data, actions: actionList });
 });
 
 // Error handling
