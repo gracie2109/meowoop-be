@@ -8,6 +8,10 @@ router.post(
   Controllers.upsertResourceAndPermissionController
 );
 
-router.post(`/${ROUTER_PREFIX.RESOURCE}/get-detail`, Controllers.getResourceDetailCtl);
+router.post(
+  `/${ROUTER_PREFIX.RESOURCE}/get-detail`,
+  Controllers.getResourceDetailCtl
+);
+router.post(`/${ROUTER_PREFIX.RESOURCE}/search`, Controllers.getListResource);
 
 export default router;

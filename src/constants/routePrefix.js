@@ -15,5 +15,6 @@ export const ROUTER_PREFIX = {
   WORKING_SCHEDULE: "working-schedule",
   APPOINTMENT: "appointment",
   RESOURCE: 'resource',
-  PERMISSION: 'permission'
+  PERMISSION: 'permission',
+  ROLES: 'roles'
 };

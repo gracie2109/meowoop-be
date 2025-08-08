@@ -28,3 +28,12 @@ export const getResourceDetailCtl = async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 };
+
+export const getListResource = async (req, res) => {
+  try {
+    const data = await getAllResourceDetails();
+    res.status(200).json({ success: true, data });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};

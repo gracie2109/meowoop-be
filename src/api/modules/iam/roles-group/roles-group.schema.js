@@ -5,13 +5,14 @@ import mongoosePaginate from "mongoose-paginate-v2";
 
 const roleSchema = new mongoose.Schema(
   {
-    resource_id: {
+    resource_actions: [{
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Resource",
+      ref: "Permission",
       required: true,
-    },
+      unique: true
+    }],
     description: { type: String },
-    name: { type: String, required: true },
+    name: { type: String, required: true , unique: true},
     status: { type: String },
   },
   {

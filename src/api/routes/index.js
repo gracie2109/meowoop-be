@@ -9,7 +9,7 @@ import EmployeeRouter from "../modules/employee/employee.route";
 import PetHealthRouter from "../modules/pet-health/pet-health.route";
 import WorkingSceheduleRouter from "../modules/working-schedule/working-schedule.route";
 import PermissionRouter from "../modules/resource-permission/permission.route";
-
+import  IAMRoleRouter from "../modules/iam/roles-group/roles-group.route"
 
 const rootRouters = [
   PetsRouter,
@@ -21,7 +21,8 @@ const rootRouters = [
   EmployeeRouter,
   PetHealthRouter,
   WorkingSceheduleRouter,
-  PermissionRouter
+  PermissionRouter,
+  IAMRoleRouter
 ];
 
 const router = express.Router();
