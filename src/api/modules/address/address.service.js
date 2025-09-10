@@ -42,7 +42,8 @@ export async function getDistric(logicticKey, providerId) {
 
       return await getOrSetCache(key, TTL_FOREVER, async () => {
         const raw = await getGHNDistric(providerId);
-        return tranformAddressProvider(raw, AddressLevel.LEVEL_2);
+        const res = raw?.filter((i) => i?.ProvinceID === +providerId);
+        return tranformAddressProvider(res, AddressLevel.LEVEL_2);
       });
     }
   } catch (error) {}
@@ -59,7 +60,8 @@ export async function getWard(logicticKey, districId) {
 
       return await getOrSetCache(key, TTL_FOREVER, async () => {
         const raw = await getGHNDWard(districId);
-        return tranformAddressProvider(raw, AddressLevel.LEVEL_3);
+        const res = raw?.filter((i) => i?.DistrictID === +districId);
+        return tranformAddressProvider(res, AddressLevel.LEVEL_3);
       });
     }
   } catch (error) {}
@@ -107,4 +109,3 @@ export const searchAddress = async (payload) => {
     totalRecord: result.totalDocs,
   };
 };
-
