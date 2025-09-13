@@ -8,7 +8,7 @@ export const ROUTER_PREFIX = {
   ASSET: "assets",
   ADDRESS: "address",
 
-  USER: "user",
+  USER: "customer",
   BOSS: "boss",
   EMPLOYEE: "employee",
   PET_HEALTH: "pet-health",

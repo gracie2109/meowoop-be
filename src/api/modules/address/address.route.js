@@ -8,8 +8,10 @@ router.post(`/${ROUTER_PREFIX.ADDRESS}/get-providers`, AddressControllder.getPro
 router.post(`/${ROUTER_PREFIX.ADDRESS}/get-districs`, AddressControllder.getDistrictController);
 router.post(`/${ROUTER_PREFIX.ADDRESS}/get-wards`, AddressControllder.getWardController);
 
-router.post(`/${ROUTER_PREFIX.ADDRESS}/create-customer-address`, AddressControllder.createUserAddressController);
+router.post(`/${ROUTER_PREFIX.ADDRESS}/create-address`, AddressControllder.createUserAddressController);
 router.post(`/${ROUTER_PREFIX.ADDRESS}/search-address`, AddressControllder.searchAddressControllder);
+router.delete(`/${ROUTER_PREFIX.ADDRESS}/:id`, AddressControllder.deleteAddressController);
+router.patch(`/${ROUTER_PREFIX.ADDRESS}/:id`, AddressControllder.updateAddressController);
 
 
 

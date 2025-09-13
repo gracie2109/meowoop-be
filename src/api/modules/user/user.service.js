@@ -1,34 +1,12 @@
 import mongoose from "mongoose";
-import User from "./user.schema";
+import User from "./user.schema.js";
 import createHttpError from "http-errors";
+import AddressModel from "../address/address.schema.js";
+import { createAuthRecord, generateTokens } from "../auth/auth.service.js";
+import { createUserAddressController } from "../address/address.controller.js";
+import { createUserAddress } from "../address/address.service.js";
+import { findCustomer } from "../../../helpers/query.js";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import crypto from "crypto";
-import AddressModel from "../address/address.schema";
-// Constants
-const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret";
-const JWT_REFRESH_SECRET =
-  process.env.JWT_REFRESH_SECRET || "your_jwt_refresh_secret";
-const ACCESS_TOKEN_EXPIRES_IN = "15m";
-const REFRESH_TOKEN_EXPIRES_IN = "7d";
-
-// Helper functions
-const generateAccessToken = (user) => {
-  return jwt.sign(
-    {
-      id: user._id,
-      email: user.email,
-      type: "access",
-    },
-    JWT_SECRET,
-    { expiresIn: ACCESS_TOKEN_EXPIRES_IN }
-  );
-};
-
-const generateRefreshToken = () => {
-  return crypto.randomBytes(40).toString("hex");
-};
-
 export const registerUser = async (payload) => {
   const { email, password, name } = payload;
 
@@ -41,24 +19,20 @@ export const registerUser = async (payload) => {
     throw createHttpError.Conflict("Email đã tồn tại");
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const refreshToken = generateRefreshToken();
-  const refreshTokenExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
-
+  // Create user
   const user = await User.create({
     email,
-    password: hashedPassword,
     name,
-    refesh_token: [
-      {
-        token: refreshToken,
-        expires_at: refreshTokenExpiresAt,
-        device_info: payload.deviceInfo || "Unknown Device",
-      },
-    ],
   });
 
-  const accessToken = generateAccessToken(user);
+  // Create auth record
+  await createAuthRecord(user._id, password);
+
+  // Generate tokens
+  const { accessToken, refreshToken } = await generateTokens(
+    user,
+    payload.deviceInfo
+  );
 
   return {
     user: user.toObject(),
@@ -74,29 +48,14 @@ export const loginUser = async (payload) => {
     throw createHttpError.BadRequest("Email và password là bắt buộc");
   }
 
-  const user = await User.findOne({ email });
-  if (!user) {
-    throw createHttpError.Unauthorized("Email hoặc mật khẩu không đúng");
-  }
+  // Use auth service for login
+  const { loginWithPassword, generateTokens } = await import(
+    "../auth/auth.service.js"
+  );
+  const { user } = await loginWithPassword(email, password);
 
-  const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) {
-    throw createHttpError.Unauthorized("Email hoặc mật khẩu không đúng");
-  }
-
-  const refreshToken = generateRefreshToken();
-  const refreshTokenExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-
-  user.refreshTokens.push({
-    token: refreshToken,
-    expires_at: refreshTokenExpiresAt,
-    device_info: device_info || "Unknown Device",
-  });
-
-  user.last_login_at = new Date();
-  await user.save();
-
-  const accessToken = generateAccessToken(user);
+  // Generate tokens
+  const { accessToken, refreshToken } = await generateTokens(user, device_info);
 
   return {
     user: user.toObject(),
@@ -108,47 +67,24 @@ export const loginUser = async (payload) => {
 export const handleGoogleAuth = async (profile) => {
   const { id, emails, displayName, photos } = profile;
 
-  let user = await User.findOne({
-    $or: [{ googleId: id }, { email: emails[0].value }],
+  // Use auth service for Google auth
+  const { handleGoogleAuth: authGoogleHandler, generateTokens } = await import(
+    "../auth/auth.service.js"
+  );
+
+  const googleProfile = {
+    id,
+    email: emails[0].value,
+    name: displayName,
+    picture: photos?.[0]?.value,
+  };
+
+  const { user } = await authGoogleHandler(googleProfile);
+
+  // Generate tokens
+  const { accessToken, refreshToken } = await generateTokens(user, {
+    platform: "Google OAuth",
   });
-
-  if (!user) {
-    const refreshToken = generateRefreshToken();
-    const refreshTokenExpiresAt = new Date(
-      Date.now() + 7 * 24 * 60 * 60 * 1000
-    );
-
-    user = await User.create({
-      email: emails[0].value,
-      name: displayName,
-      google_id: id,
-      avatar: photos?.[0]?.value,
-      refesh_token: [
-        {
-          token: refreshToken,
-          expires_at: refreshTokenExpiresAt,
-          device_info: "Google OAuth",
-        },
-      ],
-    });
-  } else if (!user.googleId) {
-    user.google_id = id;
-    user.avatar = photos?.[0]?.value;
-  }
-
-  const refreshToken = generateRefreshToken();
-  const refreshTokenExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-
-  user.refreshTokens.push({
-    token: refreshToken,
-    expires_at: refreshTokenExpiresAt,
-    device_info: "Google OAuth",
-  });
-
-  user.last_login_at = new Date();
-  await user.save();
-
-  const accessToken = generateAccessToken(user);
 
   return {
     user: user.toObject(),
@@ -158,20 +94,11 @@ export const handleGoogleAuth = async (profile) => {
 };
 
 export const refreshAccessToken = async (refreshToken) => {
-  const user = await User.findOne({
-    "refreshTokens.token": refreshToken,
-    "refreshTokens.is_revoked": false,
-    "refreshTokens.expires_at": { $gt: new Date() },
-  });
-
-  if (!user) {
-    throw createHttpError.Unauthorized(
-      "Refresh token không hợp lệ hoặc đã hết hạn"
-    );
-  }
-
-  const accessToken = generateAccessToken(user);
-  return { accessToken };
+  // Use auth service for token refresh
+  const { refreshAccessToken: authRefreshToken } = await import(
+    "../auth/auth.service.js"
+  );
+  return await authRefreshToken(refreshToken);
 };
 
 export const logout = async (userId, refreshToken) => {
@@ -180,15 +107,9 @@ export const logout = async (userId, refreshToken) => {
     throw createHttpError.NotFound("User không tồn tại");
   }
 
-  // Revoke specific refresh token
-  const tokenIndex = user.refreshTokens.findIndex(
-    (token) => token.token === refreshToken && !token.is_revoked
-  );
-
-  if (tokenIndex !== -1) {
-    user.refreshTokens[tokenIndex].is_revoked = true;
-    await user.save();
-  }
+  // Use auth service to revoke token
+  const { revokeRefreshToken } = await import("../auth/auth.service.js");
+  await revokeRefreshToken(refreshToken);
 
   return { message: "Đăng xuất thành công" };
 };
@@ -263,10 +184,154 @@ export const upsertUserInfo = async (payload) => {
     upsert: true,
   });
 
-  if(!data) {
+  if (!data) {
     return createHttpError.BadRequest("Update user fail!");
   }
-  return data.toObject()
+  return data.toObject();
 };
+
+export const searchListCustomers = async (payload) => {
+  const {
+    page = 1,
+    page_size = 25,
+    search_text = "",
+    id,
+    isShowAddress = false,
+  } = payload;
+
+  // Build match stage
+  const matchStage = {};
+
+  if (id && mongoose.Types.ObjectId.isValid(id)) {
+    matchStage._id = new mongoose.Types.ObjectId(id);
+  }
+
+  if (search_text) {
+    matchStage.$or = [
+      { name: { $regex: search_text, $options: "i" } },
+      { email: { $regex: search_text, $options: "i" } },
+      { fullName: { $regex: search_text, $options: "i" } },
+      { phone_number: { $regex: search_text, $options: "i" } },
+    ];
+  }
+
+  const pipeline = [{ $match: matchStage }, { $sort: { createdAt: -1 } }];
+
+  if (isShowAddress) {
+    pipeline.push({
+      $lookup: {
+        from: "addresses",
+        localField: "_id",
+        foreignField: "customerId",
+        as: "addresses",
+        pipeline: [
+          {
+            $project: {
+              createdAt: 0,
+              updatedAt: 0,
+            },
+          },
+          {
+            $addFields: {
+              fullAddress: {
+                $concat: [
+                  { $ifNull: ["$detail", ""] },
+                  {
+                    $cond: {
+                      if: { $ne: ["$detail", ""] },
+                      then: ", ",
+                      else: "",
+                    },
+                  },
+                  { $ifNull: ["$ward_name", ""] },
+                  {
+                    $cond: {
+                      if: { $ne: ["$ward_name", ""] },
+                      then: ", ",
+                      else: "",
+                    },
+                  },
+                  { $ifNull: ["$district_name", ""] },
+                  {
+                    $cond: {
+                      if: { $ne: ["$district_name", ""] },
+                      then: ", ",
+                      else: "",
+                    },
+                  },
+                  { $ifNull: ["$city_name", ""] },
+                ],
+              },
+            },
+          },
+        ],
+      },
+    });
+  }
+
+  const skip = (parseInt(page) - 1) * parseInt(page_size);
+  const limit = parseInt(page_size);
+
+  const countPipeline = [...pipeline, { $count: "total" }];
+  const totalResult = await User.aggregate(countPipeline);
+  const totalRecord = totalResult[0]?.total || 0;
+
+  pipeline.push({ $skip: skip }, { $limit: limit });
+
+  const result = await User.aggregate(pipeline);
+
+  return {
+    data: result,
+    totalRecord,
+  };
+};
+
+export const createCustomer = async (payload) => {
+  try {
+    const { name, password, address, ...userData } = payload;
+    if (!name || !password) {
+      throw createHttpError.BadRequest("Name và passW0rd là bắt buộc");
+    }
+    const existedUser = await findCustomer(payload);
+
+    if (existedUser) {
+      throw createHttpError.Conflict("Tài khoản đã tồn tại");
+    }
+
+    // Hash password if provided (similar to createAuthRecord)
+    const hashedPassword = password ? await bcrypt.hash(password, 10) : null;
+
+    const cleanUserData = {
+      name,
+      password: hashedPassword,
+      ...userData,
+    };
+
+    Object.keys(cleanUserData).forEach((key) => {
+      if (
+        Array.isArray(cleanUserData[key]) &&
+        cleanUserData[key].length === 0
+      ) {
+        delete cleanUserData[key];
+      }
+    });
+
+    const user = await User.create(cleanUserData);
+    let address_;
+    if (user && address) {
+      address_ = await createUserAddress({ ...address, customerId: user?._id });
+    }
+    return {
+      data: {
+        ...user.toObject(),
+        address: address_,
+      },
+    };
+  } catch (error) {
+    console.error("Error in createCustomer:", error);
+    throw error;
+  }
+};
+
 
 

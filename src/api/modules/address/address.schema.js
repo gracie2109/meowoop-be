@@ -8,37 +8,46 @@ const userAddressSchema = new mongoose.Schema(
     customerId: {
       type: mongoose.Types.ObjectId,
       ref: "User",
+      required: true,
     },
-    label: { type: String },
+    label: { type: String, default: "" },
     coordinates: {
-      lat: { type: Number },
-      lng: { type: Number },
+      lat: { type: Number, default: null },
+      lng: { type: Number, default: null },
     },
-    provider: {
-      code: { type: String },
-      name: { type: String },
-      level: {type: Number, default: 1}
+    detail: { type: String, required: true },
+    provider_code: { type: String },
+    provider_name: { type: String, required: true },
+
+    district_name: { type: String, required: true },
+    district_code: { type: String, required: true },
+
+    ward_code: { type: String },
+    ward_name: { type: String },
+
+    is_primary: { type: Boolean, default: false },
+    phone_number: {
+      type: String,
+      sparse: true,
     },
-    district: {
-      provider_id: { type: String },
-      code: { type: String },
-      name: { type: String },
-    },
-    ward: {
-      code: { type: String },
-      name: { type: String },
-      district_id: { type: String },
-    },
-    street: { type: String },
   },
   {
     timestamps: true,
     versionKey: false,
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
-    autoIndex: true,
   }
 );
+
+userAddressSchema.virtual("fullAddress").get(function () {
+  const parts = [
+    this.detail,
+    this.ward_name,
+    this.district_name,
+    this.city_name,
+  ];
+  return parts.filter((part) => part && part.trim()).join(", ");
+});
 
 userAddressSchema.plugin(mongooseAutoPopulate);
 userAddressSchema.plugin(mongooseLeanVirtuals);

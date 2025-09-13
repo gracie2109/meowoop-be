@@ -3,7 +3,9 @@ import {
   getDistric,
   getWard,
   createUserAddress,
-  searchAddress
+  searchAddress,
+  deleteUserAddress,
+  updateUserAddress
 } from "./address.service";
 import { LOGISTIC_COMP_KEY } from "../../../constants/logistics/index";
 
@@ -53,6 +55,34 @@ export const createUserAddressController = async (req, res) => {
 export const searchAddressControllder = async (req, res) => {
   try {
     const data = await searchAddress(req.body);
+    res.status(200).json({ success: true, data });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+export const deleteAddressController = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const data = await deleteUserAddress(id);
+    res.status(200).json({ success: true, data });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+export const updateAddressController = async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log('parsm', req.params, req.body);
+    
+    const payload = {
+      id,
+      ...req.body
+    };
+    
+    const data = await updateUserAddress(payload);
     res.status(200).json({ success: true, data });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });

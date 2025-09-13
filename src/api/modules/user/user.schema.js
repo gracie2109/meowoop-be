@@ -5,39 +5,48 @@ const userSchema = new mongoose.Schema(
   {
     email: {
       type: String,
-      required: true,
-      unique: true,
+      // required: true,
       trim: true,
       lowercase: true,
-    },
-    password: {
-      type: String,
-      required: function () {
-        return !this.google_id;
-      },
+      sparse: true, // Cho phép multiple null values
     },
     name: {
       type: String,
       required: true,
       trim: true,
-    },
-    google_id: {
-      type: String,
-      sparse: true,
       unique: true,
     },
-    avatar: {
+    fullName: {
       type: String,
+      trim: true,
+    },
+    password: {
+      type: String,
+      trim: true,
+    },
+    avatar: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Asset",
+      required: false,
+      default: null,
+      set: function (value) {
+        // Handle empty array or invalid values
+        if (Array.isArray(value) && value.length === 0) return null;
+        if (!value || value === "" || value === "null") return null;
+        return value;
+      },
     },
     dob: {
       type: Date,
     },
     gender: {
       type: String,
-      enum: ["male", "female", "other"],
+      enum: ["0", "1", "2"],
     },
     phone_number: {
       type: String,
+      unique: true,
+      sparse: true, // Cho phép multiple null values
     },
     locale: {
       type: String,
@@ -45,61 +54,28 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["owner", "veterinarian", "staff", "admin"],
-      default: "owner",
+      enum: ["owner", "veterinarian", "staff", "admin", "user"],
+      default: "user",
       index: true,
     },
-    password_changed_at: {
-      type: Date,
-    },
-    refresh_tokens: [
-      {
-        token: String,
-        expires_at: Date,
-        created_at: {
-          type: Date,
-          default: Date.now,
-        },
-        device_info: {
-          platform: String,
-          browser: String,
-          ip: String,
-        },
-        is_revoked: {
-          type: Boolean,
-          default: false,
-        },
-      },
-    ],
     is_active: {
       type: Boolean,
       default: true,
-    },
-    last_login_at: {
-      type: Date,
     },
     default_address_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Address",
       autopopulate: true,
     },
-    addresses: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Address",
-        autopopulate: true,
-      },
-    ],
   },
   {
     timestamps: true,
   }
 );
 
-// Indexes
-userSchema.index({ email: 1 });
-userSchema.index({ google_id: 1 });
-userSchema.index({ "refresh_tokens.token": 1 });
+// Indexes với sparse để xử lý null values
+userSchema.index({ email: 1 }, { unique: true, sparse: true });
+userSchema.index({ phone_number: 1 }, { unique: true, sparse: true });
 userSchema.index({ name: "text", email: "text" });
 
 // Plugins

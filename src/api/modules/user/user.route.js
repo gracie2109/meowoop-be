@@ -1,44 +1,20 @@
 import express from "express";
-import passport from "passport";
-import { authenticateJWT } from "../../middleware/auth.middleware";
+import { authenticateJWT } from "../../middleware/auth.middleware.js";
 import {
-  register,
-  login,
-  googleCallback,
-  refreshToken,
-  logoutUser,
-  logoutAll,
-  getCurrentUser
-} from "./user.controller";
+  getCurrentUser,
+  searchListCustomer,
+  createUser
+} from "./user.controller.js";
+import { ROUTER_PREFIX } from "../../../constants/routePrefix.js";
 
 const router = express.Router();
 
+// Auth routes moved to auth.route.js
 
-router.post("/register", register);
-router.post("/login", login);
-router.post("/refresh-token", refreshToken);
-
-router.get(
-  "/google",
-  passport.authenticate("google", {
-    scope: ["profile", "email"]
-  })
-);
-
-router.get(
-  "/google/callback",
-  passport.authenticate("google", {
-    session: false,
-    failureRedirect: "/login"
-  }),
-  googleCallback
-);
-
-// Protected routes
-router.use(authenticateJWT); 
+// Protected user profile routes
+// router.use(authenticateJWT);
 
 router.get("/me", getCurrentUser);
-router.post("/logout", logoutUser);
-router.post("/logout-all", logoutAll);
-
+router.post(`/${ROUTER_PREFIX.USER}/search`, searchListCustomer);
+router.post(`/${ROUTER_PREFIX.USER}/create`, createUser); 
 export default router;
