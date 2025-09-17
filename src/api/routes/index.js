@@ -5,7 +5,7 @@ import AssetRouter from "../modules/assets/asset.routes.js";
 import AddressRoute from "../modules/address/address.route.js";
 import UserRouter from "../modules/user/user.route.js";
 import AuthRouter from "../modules/auth/auth.route.js";
-import BossRouter from "../modules/boss/boss.routes.js";
+import BossRouter from "../modules/pet-boss/pet-boss.route.js";
 import EmployeeRouter from "../modules/employee/employee.route.js";
 import PetHealthRouter from "../modules/pet-health/pet-health.route.js";
 import WorkingSceheduleRouter from "../modules/working-schedule/working-schedule.route.js";

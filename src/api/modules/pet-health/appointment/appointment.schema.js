@@ -1,5 +1,8 @@
 import mongoose from "mongoose";
-import { DEFAULT_PRIORITY } from "../contants";
+import { APPOIMENT_PRIORITY, DEFAULT_PRIORITY } from "../contants";
+import mongooseAutoPopulate from "mongoose-autopopulate";
+import mongooseLeanVirtuals from "mongoose-lean-virtuals";
+import mongoosePaginate from "mongoose-paginate-v2";
 
 const appointmentSchema = new mongoose.Schema({
   pet_id: {
@@ -22,14 +25,16 @@ const appointmentSchema = new mongoose.Schema({
   reason: { type: String }, // ví dụ: Khám định kỳ, tiêm phòng, triệu chứng lạ...
   note: { type: String },
   appointment_time: { type: Date, required: true },
-  priority: { //Used to make informed decisions if needing to re-prioritize
-    enum: APPOIMENT_PRIORITY,
-    default: DEFAULT_PRIORITY,
-  },
+  priority:  { type: String },
   status: {
     type: String,
     enum: ["pending", "confirmed", "completed", "canceled", "no_show"],
     default: "pending",
   },
 });
-export const Appointment = mongoose.model("Appointment", appointmentSchema);
+appointmentSchema.plugin(mongooseAutoPopulate);
+appointmentSchema.plugin(mongooseLeanVirtuals);
+appointmentSchema.plugin(mongoosePaginate);
+
+const Appointment = mongoose.model("Appointment", appointmentSchema);
+export default Appointment;
